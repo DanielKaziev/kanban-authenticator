@@ -2,7 +2,7 @@ import Permission from "./Permission";
 import Role from "./Role";
 import RolePermission from "./RolePermission";
 import Token from "./Token";
-import User from "./Users";
+import User from "./User";
 import UserStateHistory from "./UserStateHistory";
 
 // User.roleId > Role.id

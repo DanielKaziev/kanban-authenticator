@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import { EUserState } from "../types/state";
+import { EUserState } from "../config/state";
 import sequelize from "../db";
 
 interface UserAttributes {
