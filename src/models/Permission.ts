@@ -24,6 +24,7 @@ const Permission = sequelize.define<PermissionInstance>(
     action: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
   },
   {
