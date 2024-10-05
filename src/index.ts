@@ -6,6 +6,7 @@ import sequelize from "./db";
 import "./models/models";
 import router from "./routes";
 import checkAndCreateRolesAndPermissions from "./config/db_init";
+import errorMiddleware from "./middlewares/errorMiddleware";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(BASE_URL, router);
+app.use(errorMiddleware);
 
 const start = async () => {
   try {

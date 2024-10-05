@@ -1,26 +1,28 @@
 class RequestError extends Error {
   public status: number;
   public message: string;
-  constructor(status: number, message: string) {
+  public errors?: Array<any>
+  constructor(status: number, message: string, errors?: Array<any>) {
     super(message);
     this.status = status;
     this.message = message;
+    this.errors = errors;
   }
 
-  static BadRequest(message: string) {
-    throw new RequestError(400, message);
+  static BadRequest(message: string, errors?: Array<any>) {
+    throw new RequestError(400, message, errors);
   }
 
-  static Unauthorized(message: string) {
-    throw new RequestError(401, message);
+  static Unauthorized(message: string, errors?: Array<any>) {
+    throw new RequestError(401, message, errors);
   }
 
-  static Forbidden(message: string) {
-    throw new RequestError(403, message);
+  static Forbidden(message: string, errors?: Array<any>) {
+    throw new RequestError(403, message, errors);
   }
 
-  static NotFound(message: string) {
-    throw new RequestError(404, message);
+  static NotFound(message: string, errors?: Array<any>) {
+    throw new RequestError(404, message, errors);
   }
 }
 

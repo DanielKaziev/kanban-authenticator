@@ -1,25 +1,38 @@
 import { Request, Response, NextFunction } from "express";
 import authService from "../service/authService";
 import { setTokensToCookiesInResponse } from "../utils/cookiesSetter";
+import { validationResult } from "express-validator";
+import { RequestError } from "../utils/errors";
 
 class AuthController {
   public async login(req: Request, res: Response, next: NextFunction) {
     try {
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   }
 
   public async logout(req: Request, res: Response, next: NextFunction) {
     try {
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   }
 
   public async refresh(req: Request, res: Response, next: NextFunction) {
     try {
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   }
 
   public async registration(req: Request, res: Response, next: NextFunction) {
     try {
+      const validationErrors = validationResult(req)
+      if (!validationErrors.isEmpty()) {
+        return next(RequestError.BadRequest("Validation error: ", validationErrors.array()))
+      }
+
       const { email, password, username } = req.body;
       const authData = await authService.registration({
         email,
@@ -31,7 +44,7 @@ class AuthController {
 
       return res.json(authData);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 }
