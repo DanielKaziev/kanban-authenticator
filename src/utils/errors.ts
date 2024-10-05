@@ -33,10 +33,13 @@ class ResponseError extends Error {
     this.message = message;
   }
 
+  static InternalServerError(message: string) {
+    throw new RequestError(500, message);
+  }
+
   static NotImplemented(message: string) {
     throw new RequestError(501, message);
   }
-
 }
 
 export { RequestError, ResponseError };

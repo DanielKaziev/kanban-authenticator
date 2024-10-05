@@ -5,7 +5,6 @@ interface TokenAttributes {
   id: string;
   token: string;
   userId: string;
-  expiresAt: Date;
 }
 
 export interface TokenInstance
@@ -24,15 +23,11 @@ const Token = sequelize.define<TokenInstance>(
       primaryKey: true,
     },
     token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     userId: {
       type: DataTypes.UUID,
-      allowNull: false,
-    },
-    expiresAt: {
-      type: DataTypes.DATE,
       allowNull: false,
     },
   },
