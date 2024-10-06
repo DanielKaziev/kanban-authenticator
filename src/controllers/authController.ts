@@ -23,6 +23,15 @@ class AuthController {
 
   public async logout(req: Request, res: Response, next: NextFunction) {
     try {
+      const { refreshToken } = req.cookies;
+      if (!refreshToken)
+        throw RequestError.BadRequest("Refresh token is empty!");
+
+      const token = await authService.logout(refreshToken);
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
+      return res.json(token);
     } catch (error) {
       next(error);
     }

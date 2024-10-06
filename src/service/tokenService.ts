@@ -20,6 +20,7 @@ class TokenService {
     });
     return { accessToken, refreshToken };
   }
+
   async saveTokens(userId: string, refreshToken: string) {
     const tokenData = await Token.findOne({ where: { userId: userId } });
 
@@ -29,6 +30,11 @@ class TokenService {
 
     const token = await Token.create({ token: refreshToken, userId: userId });
     return token;
+  }
+
+  async removeToken(refreshToken: string) {
+    const tokenData = await Token.destroy({ where: { token: refreshToken } });
+    return tokenData;
   }
 }
 export default new TokenService();
