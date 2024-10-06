@@ -5,10 +5,10 @@ import { RequestError, ResponseError } from "../utils/errors";
 import bcrypt from "bcrypt";
 import tokenService from "./tokenService";
 import UserDto from "../dtos/userDto";
-import { IUserCredentials } from "../types/users";
+import { IBaseUserCredentials, ICreateUserCredentials } from "../types/users";
 
 class AuthService {
-  async registration(data: IUserCredentials) {
+  async registration(data: ICreateUserCredentials) {
     const { email, password, username } = data;
 
     const isExist = await User.findOne({ where: { email } });
@@ -40,8 +40,30 @@ class AuthService {
         ...tokens,
       };
     } else {
-      ResponseError.InternalServerError("Can't find user role id");
+      throw ResponseError.InternalServerError("Can't find user role id");
     }
+  }
+
+  async login(data: IBaseUserCredentials) {
+    const { email, password } = data;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user)
+      throw RequestError.BadRequest(`User with email: ${email} doesn't exist!`);
+
+    const isPasswordSame = await bcrypt.compare(password, user.password);
+    if (!isPasswordSame)
+      throw RequestError.BadRequest(
+        `Incorrect password for user: ${user.email}`
+      );
+
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateTokens({ ...userDto });
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+    };
   }
 }
 

@@ -7,6 +7,15 @@ import { RequestError } from "../utils/errors";
 class AuthController {
   public async login(req: Request, res: Response, next: NextFunction) {
     try {
+      const { email, password } = req.body;
+      const authData = await authService.login({
+        email,
+        password,
+      });
+
+      setTokensToCookiesInResponse(res, authData!);
+
+      return res.json(authData);
     } catch (error) {
       next(error);
     }
@@ -28,9 +37,14 @@ class AuthController {
 
   public async registration(req: Request, res: Response, next: NextFunction) {
     try {
-      const validationErrors = validationResult(req)
+      const validationErrors = validationResult(req);
       if (!validationErrors.isEmpty()) {
-        return next(RequestError.BadRequest("Validation error: ", validationErrors.array()))
+        return next(
+          RequestError.BadRequest(
+            "Validation error: ",
+            validationErrors.array()
+          )
+        );
       }
 
       const { email, password, username } = req.body;

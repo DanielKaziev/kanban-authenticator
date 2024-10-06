@@ -6,9 +6,12 @@ export interface IUserTokensPayload {
   state: EUserState;
 }
 
-export interface IUserCredentials {
+export interface IBaseUserCredentials {
   email: string;
   password: string;
+}
+
+export interface ICreateUserCredentials extends IBaseUserCredentials {
   username: string;
 }
 
