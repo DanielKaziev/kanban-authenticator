@@ -8,7 +8,7 @@ import UserDto from "../dtos/userDto";
 import { IBaseUserCredentials, ICreateUserCredentials } from "../types/users";
 
 class AuthService {
-  async registration(data: ICreateUserCredentials) {
+  public async registration(data: ICreateUserCredentials) {
     const { email, password, username } = data;
 
     const isExist = await User.findOne({ where: { email } });
@@ -44,7 +44,7 @@ class AuthService {
     }
   }
 
-  async login(data: IBaseUserCredentials) {
+  public async login(data: IBaseUserCredentials) {
     const { email, password } = data;
 
     const user = await User.findOne({ where: { email } });
@@ -66,9 +66,31 @@ class AuthService {
     };
   }
 
-  async logout(refreshToken: string) {
+  public async logout(refreshToken: string) {
     const token = await tokenService.removeToken(refreshToken);
     return token;
+  }
+
+  public async refresh(refreshToken: string) {
+    if (!refreshToken)
+      throw RequestError.Unauthorized("Incorrect refresh token!");
+
+    const userData = tokenService.validateRefreshToken(refreshToken);
+    const tokenFromBb = await tokenService.findToken(refreshToken);
+    if (!userData || !tokenFromBb) {
+      throw RequestError.Unauthorized("User is not authorized!");
+    }
+
+    const user = await User.findOne({ where: { id: userData.id } });
+    if (!user) throw RequestError.Unauthorized("User is not authorized!");
+
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateTokens({ ...userDto });
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+    };
   }
 }
 
