@@ -25,6 +25,7 @@ const Role = sequelize.define<RoleInstance>(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     description: {
       type: DataTypes.STRING,
