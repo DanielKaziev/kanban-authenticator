@@ -14,9 +14,16 @@ const app: Application = express();
 const PORT = process.env.KANBAN_AUTH_PORT || 5000;
 const BASE_URL = process.env.KANBAN_BASE_API_URL || "/api";
 
+const corsOptions = {
+  origin: 'http://localhost:3000',  // Укажите точный origin, не используйте '*'
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true,                // Разрешаем отправку credentials (cookie, заголовки)
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(BASE_URL, router);
 app.use(errorMiddleware);
 
