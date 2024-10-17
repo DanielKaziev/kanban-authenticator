@@ -18,6 +18,7 @@ const DB_DATA: Options = {
   dialect: "postgres",
   host: KANBAN_DB_HOST,
   port: Number(KANBAN_DB_PORT),
+  logging: false,
 };
 
 const sequelize = new Sequelize(DB_DATA);
