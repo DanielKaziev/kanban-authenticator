@@ -4,8 +4,29 @@ import RolePermission from "../models/RolePermission";
 
 const checkAndCreateRolesAndPermissions = async () => {
   const rolesPermissions = {
-    admin: ["control_users", "control_board"],
-    user: ["create_board", "update_board", "delete_board"],
+    admin: [
+      "control_users",
+      "create_board",
+      "update_board",
+      "delete_board",
+      "create_task",
+      "update_task",
+      "delete_task",
+      "create_event",
+      "update_event",
+      "delete_event",
+    ],
+    user: [
+      "create_board",
+      "update_board",
+      "delete_board",
+      "create_task",
+      "update_task",
+      "delete_task",
+      "create_event",
+      "update_event",
+      "delete_event",
+    ],
   };
 
   for (const [roleName, permissions] of Object.entries(rolesPermissions)) {
