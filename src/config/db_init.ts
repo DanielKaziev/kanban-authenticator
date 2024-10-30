@@ -4,36 +4,41 @@ import RolePermission from "../models/RolePermission";
 
 const checkAndCreateRolesAndPermissions = async () => {
   const rolesPermissions = {
-    admin: [
-      "control_users",
-      "create_board",
-      "update_board",
-      "delete_board",
-      "create_task",
-      "update_task",
-      "delete_task",
-      "create_event",
-      "update_event",
-      "delete_event",
-    ],
-    user: [
-      "create_board",
-      "update_board",
-      "delete_board",
-      "create_task",
-      "update_task",
-      "delete_task",
-      "create_event",
-      "update_event",
-      "delete_event",
-    ],
+    admin: {
+      isGlobal: true,
+      permissions: [
+        "control_users",
+        "control_roles",
+        "control_permissions",
+        "control_boards",
+        "control_events",
+        "control_tasks",
+      ],
+    },
+    user: {
+      isGlobal: true,
+      permissions: [
+        "create_board",
+        "update_board",
+        "delete_board",
+        "create_task",
+        "update_task",
+        "delete_task",
+        "create_event",
+        "update_event",
+        "delete_event",
+      ],
+    },
   };
 
-  for (const [roleName, permissions] of Object.entries(rolesPermissions)) {
+  for (const [roleName, { permissions, isGlobal }] of Object.entries(rolesPermissions)) {
+    
     let role = await Role.findOne({ where: { name: roleName } });
+    
     if (!role) {
       role = await Role.create({
         name: roleName,
+        isGlobal: isGlobal,
         description: `${roleName} role`,
       });
       console.log(`Создана роль: ${roleName}`);
@@ -60,11 +65,10 @@ const checkAndCreateRolesAndPermissions = async () => {
           roleId: role.id,
           permissionId: permission.id,
         });
-        console.log(
-          `Роль ${roleName} связана с разрешением ${permissionAction}`
-        );
+        console.log(`Роль ${roleName} связана с разрешением ${permissionAction}`);
       }
     }
   }
 };
+
 export default checkAndCreateRolesAndPermissions;

@@ -4,6 +4,7 @@ import sequelize from "../db";
 interface RoleAttributes {
   id: string;
   name: string;
+  isGlobal: boolean;
   description: string;
 }
 
@@ -26,6 +27,10 @@ const Role = sequelize.define<RoleInstance>(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    isGlobal: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
