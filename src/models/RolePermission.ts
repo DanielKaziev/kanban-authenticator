@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../db";
+import { PermissionInstance } from "./Permission";
 
 interface RolePermissionAttributes {
   roleId: string;
@@ -8,7 +9,9 @@ interface RolePermissionAttributes {
 
 export interface RolePermissionInstance
   extends Model<RolePermissionAttributes>,
-    RolePermissionAttributes {}
+    RolePermissionAttributes {
+  Permission: PermissionInstance;
+}
 
 const RolePermission = sequelize.define<RolePermissionInstance>(
   "RolePermission",

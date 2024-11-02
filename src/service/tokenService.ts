@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { ITokenData, ITokens, IUserTokensPayload } from "../types/users";
 import Token from "../models/Token";
+import ResponseBuilder from "../utils/responseBuilder";
+import { EUserResponse } from "../config/messages";
 
 dotenv.config();
 
@@ -62,6 +64,22 @@ class TokenService {
   public async findToken(refreshToken: string) {
     const tokenData = await Token.findOne({ where: { token: refreshToken } });
     return tokenData;
+  }
+
+  public validateAccessTokenWithPermission(
+    accessToken: string,
+    permission: string
+  ) {
+    const verified = this.validateAccessToken(accessToken);
+    if (!verified)
+      return ResponseBuilder.createResponse(false, EUserResponse.TOKEN_INVALID);
+
+    const userRoles = verified.permissions;
+    if (userRoles.includes(permission)) {
+      return ResponseBuilder.createResponse(true, EUserResponse.HAS_PERMISSION);
+    } else {
+      return ResponseBuilder.createResponse(false, EUserResponse.NO_PERMISSION);
+    }
   }
 }
 export default new TokenService();

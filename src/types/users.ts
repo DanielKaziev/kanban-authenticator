@@ -4,6 +4,7 @@ export interface IUserTokensPayload {
   username: string;
   email: string;
   state: EUserState;
+  permissions: Array<string>;
 }
 
 export interface IBaseUserCredentials {
@@ -25,6 +26,7 @@ export interface ITokenData {
   username: string;
   email: string;
   state: string;
+  permissions: Array<string>;
   iat: number;
   exp: number;
 }
