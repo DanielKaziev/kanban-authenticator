@@ -1,9 +1,15 @@
 import { IResponseMessage } from "../types/common";
 
 class ResponseBuilder {
-  static createResponse(access: boolean, message: string): IResponseMessage {
+  static successResponse(message: string): IResponseMessage {
     return {
-      access: access,
+      access: true,
+      message: message,
+    };
+  }
+  static errorResponse(message: string): IResponseMessage {
+    return {
+      access: false,
       message: message,
     };
   }

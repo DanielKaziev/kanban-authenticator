@@ -7,11 +7,16 @@ message AuthRequest {
     string permission = 2;
 }
 
+message AuthTokenRequest {
+    string token = 1;
+}
+
 message AuthResponse {
     bool access = 1;
     string message = 2;
 }
 
 service AuthService {
-    rpc ValidateToken (AuthRequest) returns (AuthResponse);
+    rpc ValidateTokenPermission (AuthRequest) returns (AuthResponse);
+    rpc ValidateToken (AuthTokenRequest) returns (AuthResponse);
 }

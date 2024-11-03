@@ -1,7 +1,10 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import path from "path";
-import tokenService from "./service/tokenService";
+import {
+  handleValidateToken,
+  handleValidateTokenPermission,
+} from "./proto/token";
 
 const PROTO_PATH = path.join(__dirname, "./proto/auth.proto");
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
@@ -10,14 +13,8 @@ const authProto = grpc.loadPackageDefinition(packageDefinition).auth as any;
 const server = new grpc.Server();
 
 server.addService(authProto.AuthService.service, {
-  ValidateToken: (call: any, callback: any) => {
-    const { token, permission } = call.request;
-    const validationResult = tokenService.validateAccessTokenWithPermission(
-      token,
-      permission
-    );
-    callback(null, validationResult);
-  },
+  ValidateTokenPermission: handleValidateTokenPermission,
+  ValidateToken: handleValidateToken,
 });
 
 const PORT = process.env.GRPC_PORT || "50051";
@@ -27,6 +24,5 @@ server.bindAsync(
   grpc.ServerCredentials.createInsecure(),
   () => {
     console.log(`gRPC server running at http://0.0.0.0:${PORT}`);
-    server.start();
   }
 );
