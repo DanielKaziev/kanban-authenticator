@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
-import Role from "../models/Role";
 import Permission from "../models/Permission";
 import RolePermission from "../models/RolePermission";
-import { ResponseError } from "../utils/errors";
 
 dotenv.config();
 
@@ -18,7 +16,7 @@ class PermissionService {
       ],
     });
     const actions = rolePermissions.map(
-      (rolePermission) => rolePermission.Permission?.action
+      (rolePermission) => rolePermission.Permission.action
     );
 
     return actions;

@@ -74,8 +74,8 @@ class TokenService {
     if (!verified)
       return ResponseBuilder.createResponse(false, EUserResponse.TOKEN_INVALID);
 
-    const userRoles = verified.permissions;
-    if (userRoles.includes(permission)) {
+    const userPermissions = verified.permissions;
+    if (userPermissions.includes(permission)) {
       return ResponseBuilder.createResponse(true, EUserResponse.HAS_PERMISSION);
     } else {
       return ResponseBuilder.createResponse(false, EUserResponse.NO_PERMISSION);
