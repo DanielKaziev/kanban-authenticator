@@ -1,14 +1,18 @@
 import { EUserResponse } from "../config/messages";
 import tokenService from "../service/tokenService";
 import { logMessage } from "../utils/logger";
-import ResponseBuilder from "../utils/responseBuilder";
+import ResponseBuilderRPC from "../utils/responseBuilder";
 
 export function handleValidateTokenPermission(call: any, callback: any) {
+  logMessage("info", "handleValidateTokenPermission");
   const { token, permission } = call.request;
   const verifiedToken = tokenService.validateAccessToken(token);
 
   if (!verifiedToken) {
-    callback(null, ResponseBuilder.errorResponse(EUserResponse.TOKEN_INVALID));
+    callback(
+      null,
+      ResponseBuilderRPC.errorResponse(EUserResponse.TOKEN_INVALID, 401)
+    );
     return;
   }
 
@@ -16,22 +20,30 @@ export function handleValidateTokenPermission(call: any, callback: any) {
   if (hasPermission) {
     callback(
       null,
-      ResponseBuilder.successResponse(EUserResponse.HAS_PERMISSION)
+      ResponseBuilderRPC.successResponse(EUserResponse.HAS_PERMISSION, 200)
     );
   } else {
-    callback(null, ResponseBuilder.errorResponse(EUserResponse.NO_PERMISSION));
+    callback(
+      null,
+      ResponseBuilderRPC.errorResponse(EUserResponse.NO_PERMISSION, 403)
+    );
   }
-  logMessage("info", "handleValidateTokenPermission");
 }
 
 export function handleValidateToken(call: any, callback: any) {
+  logMessage("info", "handleValidateToken");
   const { token } = call.request;
   const validationResult = tokenService.validateAccessToken(token);
 
   if (!validationResult) {
-    callback(null, ResponseBuilder.errorResponse(EUserResponse.TOKEN_INVALID));
+    callback(
+      null,
+      ResponseBuilderRPC.errorResponse(EUserResponse.TOKEN_INVALID, 401)
+    );
   } else {
-    callback(null, ResponseBuilder.successResponse(EUserResponse.TOKEN_VALID));
+    callback(
+      null,
+      ResponseBuilderRPC.successResponse(EUserResponse.TOKEN_VALID, 204)
+    );
   }
-  logMessage("info", "handleValidateToken");
 }

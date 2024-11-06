@@ -14,6 +14,7 @@ message AuthTokenRequest {
 message AuthResponse {
     bool access = 1;
     string message = 2;
+    int32 code = 3;
 }
 
 service AuthService {

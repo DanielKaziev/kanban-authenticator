@@ -1,18 +1,21 @@
 import { IResponseMessage } from "../types/common";
 
-class ResponseBuilder {
-  static successResponse(message: string): IResponseMessage {
+class ResponseBuilderRPC {
+  static successResponse(message: string, code: number): IResponseMessage {
     return {
-      access: true,
+      access: false,
+      code: code,
       message: message,
     };
   }
-  static errorResponse(message: string): IResponseMessage {
+
+  static errorResponse(message: string, code: number): IResponseMessage {
     return {
       access: false,
+      code: code,
       message: message,
     };
   }
 }
 
-export default ResponseBuilder;
+export default ResponseBuilderRPC;
