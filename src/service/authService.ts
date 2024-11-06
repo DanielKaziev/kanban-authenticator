@@ -62,21 +62,19 @@ class AuthService {
     }
 
     const role = await Role.findOne({ where: { name: EUserRole.USER } });
-
-    if (role) {
-      const actions = await permissionService.getPermissionsByRoleId(role.id);
-
-      const userDto = new UserDto(user, role.name, actions);
-
-      const tokens = tokenService.generateTokens({ ...userDto });
-      await tokenService.saveTokens(userDto.id, tokens.refreshToken);
-
-      return {
-        ...tokens,
-      };
-    } else {
+    if (!role)
       throw ResponseError.InternalServerError("Can't find user role id");
-    }
+
+    const actions = await permissionService.getPermissionsByRoleId(role.id);
+
+    const userDto = new UserDto(user, role.name, actions);
+
+    const tokens = tokenService.generateTokens({ ...userDto });
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+    };
   }
 
   public async logout(refreshToken: string) {
@@ -98,21 +96,18 @@ class AuthService {
     if (!user) throw RequestError.Unauthorized("User is not authorized!");
 
     const role = await Role.findOne({ where: { name: EUserRole.USER } });
-
-    if (role) {
-      const actions = await permissionService.getPermissionsByRoleId(role.id);
-
-      const userDto = new UserDto(user, role.name, actions);
-
-      const tokens = tokenService.generateTokens({ ...userDto });
-      await tokenService.saveTokens(userDto.id, tokens.refreshToken);
-
-      return {
-        ...tokens,
-      };
-    } else {
+    if (!role)
       throw ResponseError.InternalServerError("Can't find user role id");
-    }
+
+    const actions = await permissionService.getPermissionsByRoleId(role.id);
+    const userDto = new UserDto(user, role.name, actions);
+
+    const tokens = tokenService.generateTokens({ ...userDto });
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+    };
   }
 }
 

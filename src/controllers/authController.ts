@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import authService from "../service/authService";
-import { setTokensToCookiesInResponse } from "../utils/cookiesSetter";
 import { validationResult } from "express-validator";
 import { RequestError } from "../utils/errors";
 
@@ -13,8 +12,6 @@ class AuthController {
         password,
       });
 
-      setTokensToCookiesInResponse(res, authData!);
-
       return res.json(authData);
     } catch (error) {
       next(error);
@@ -23,13 +20,11 @@ class AuthController {
 
   public async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refreshToken } = req.body;
       if (!refreshToken)
         throw RequestError.BadRequest("Refresh token is empty!");
 
       const token = await authService.logout(refreshToken);
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken");
 
       return res.json(token);
     } catch (error) {
@@ -39,10 +34,8 @@ class AuthController {
 
   public async refresh(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refreshToken } = req.body;
       const authData = await authService.refresh(refreshToken);
-
-      setTokensToCookiesInResponse(res, authData!);
 
       return res.json(authData);
     } catch (error) {
@@ -68,8 +61,6 @@ class AuthController {
         password,
         username,
       });
-
-      setTokensToCookiesInResponse(res, authData!);
 
       return res.json(authData);
     } catch (error) {
