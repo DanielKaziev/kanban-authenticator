@@ -3,7 +3,7 @@ import { IResponseMessage } from "../types/common";
 class ResponseBuilderRPC {
   static successResponse(message: string, code: number): IResponseMessage {
     return {
-      access: false,
+      access: true,
       code: code,
       message: message,
     };
