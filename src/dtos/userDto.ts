@@ -6,12 +6,16 @@ class UserDto {
   public username: string;
   public email: string;
   public state: EUserState;
+  public role: string;
+  public permissions: Array<string>;
 
-  constructor(user: UserInstance) {
+  constructor(user: UserInstance, role: string, permission: Array<string>) {
     this.id = user.id;
     this.username = user.username;
     this.email = user.email;
     this.state = user.state;
+    this.role = role;
+    this.permissions = permission;
   }
 }
 

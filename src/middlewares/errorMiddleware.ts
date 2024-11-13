@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
 import { RequestError, ResponseError } from "../utils/errors";
 
-const errorHandler: ErrorRequestHandler = (
+const errorMiddleware: ErrorRequestHandler = (
   err: any,
   req: Request,
   res: Response,
@@ -14,7 +14,7 @@ const errorHandler: ErrorRequestHandler = (
       errors: err.errors,
     });
   }
-  return res.status(500).json({ message: err.message});
+  return res.status(500).json({ message: err.message });
 };
 
-export default errorHandler;
+export default errorMiddleware;

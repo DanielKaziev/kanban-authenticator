@@ -2,6 +2,7 @@ import app from "./app";
 import sequelize from "./db";
 import dotenv from "dotenv";
 import checkAndCreateRolesAndPermissions from "./config/db_init";
+import "./grpcServer";
 
 dotenv.config();
 

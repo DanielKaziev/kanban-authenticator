@@ -1,53 +1,27 @@
 import Permission from "../models/Permission";
 import Role from "../models/Role";
 import RolePermission from "../models/RolePermission";
+import ROLES from "./roles";
 
 const checkAndCreateRolesAndPermissions = async () => {
-  const rolesPermissions = {
-    admin: {
-      isGlobal: true,
-      permissions: [
-        "control_users",
-        "control_roles",
-        "control_permissions",
-        "control_boards",
-        "control_events",
-        "control_tasks",
-      ],
-    },
-    user: {
-      isGlobal: true,
-      permissions: [
-        "create_board",
-        "update_board",
-        "delete_board",
-        "create_task",
-        "update_task",
-        "delete_task",
-        "create_event",
-        "update_event",
-        "delete_event",
-      ],
-    },
-  };
+  for (const role of ROLES) {
+    const { name, permissions } = role;
 
-  for (const [roleName, { permissions, isGlobal }] of Object.entries(rolesPermissions)) {
-    
-    let role = await Role.findOne({ where: { name: roleName } });
-    
-    if (!role) {
-      role = await Role.create({
-        name: roleName,
-        isGlobal: isGlobal,
-        description: `${roleName} role`,
+    let dbRole = await Role.findOne({ where: { name } });
+
+    if (!dbRole) {
+      dbRole = await Role.create({
+        name,
+        description: `${name} role`,
       });
-      console.log(`Создана роль: ${roleName}`);
+      console.log(`Создана роль: ${name}`);
     }
 
     for (const permissionAction of permissions) {
       let permission = await Permission.findOne({
         where: { action: permissionAction },
       });
+
       if (!permission) {
         permission = await Permission.create({ action: permissionAction });
         console.log(`Создано разрешение: ${permissionAction}`);
@@ -55,17 +29,17 @@ const checkAndCreateRolesAndPermissions = async () => {
 
       const rolePermissionExists = await RolePermission.findOne({
         where: {
-          roleId: role.id,
+          roleId: dbRole.id,
           permissionId: permission.id,
         },
       });
 
       if (!rolePermissionExists) {
         await RolePermission.create({
-          roleId: role.id,
+          roleId: dbRole.id,
           permissionId: permission.id,
         });
-        console.log(`Роль ${roleName} связана с разрешением ${permissionAction}`);
+        console.log(`Роль ${name} связана с разрешением ${permissionAction}`);
       }
     }
   }
