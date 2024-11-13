@@ -3,3 +3,8 @@ export interface IResponseMessage {
   code: number;
   message: string;
 }
+
+export interface IRoles {
+  name: string;
+  permissions: Array<string>;
+}
