@@ -15,7 +15,7 @@ class AuthService {
     const isExist = await User.findOne({ where: { email } });
 
     if (isExist)
-      RequestError.BadRequest(`User with email: ${email} already exist!`);
+      throw RequestError.BadRequest(`User with email: ${email} already exist!`);
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
