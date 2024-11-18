@@ -21,30 +21,27 @@ class AuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const role = await Role.findOne({ where: { name: EUserRole.USER } });
+    if (!role)  throw ResponseError.InternalServerError("Can't find user role id");
 
-    if (role) {
-      const user = await User.create({
-        email: email,
-        password: hashedPassword,
-        username: username,
-        roleId: role.id,
-        salt: salt,
-        state: EUserState.ACTIVE,
-      });
+    const user = await User.create({
+      email: email,
+      password: hashedPassword,
+      username: username,
+      roleId: role.id,
+      salt: salt,
+      state: EUserState.ACTIVE,
+    });
 
-      const actions = await permissionService.getPermissionsByRoleId(role.id);
+    const actions = await permissionService.getPermissionsByRoleId(role.id);
 
-      const userDto = new UserDto(user, role.name, actions);
-      const tokens = tokenService.generateTokens({ ...userDto });
+    const userDto = new UserDto(user, role.name, actions);
+    const tokens = tokenService.generateTokens({ ...userDto });
 
-      await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
 
-      return {
-        ...tokens,
-      };
-    } else {
-      throw ResponseError.InternalServerError("Can't find user role id");
-    }
+    return {
+      ...tokens,
+    };
   }
 
   public async login(data: IBaseUserCredentials) {
@@ -61,11 +58,11 @@ class AuthService {
       );
     }
 
-    const role = await Role.findOne({ where: { name: EUserRole.USER } });
+    const role = await Role.findOne({ where: { id: user.roleId } });
     if (!role)
-      throw ResponseError.InternalServerError("Can't find user role id");
+      throw ResponseError.InternalServerError("Can't find user role");
 
-    const actions = await permissionService.getPermissionsByRoleId(role.id);
+    const actions = await permissionService.getPermissionsByRoleId(user.roleId);
 
     const userDto = new UserDto(user, role.name, actions);
 
@@ -95,11 +92,11 @@ class AuthService {
     const user = await User.findOne({ where: { id: userData.id } });
     if (!user) throw RequestError.Unauthorized("User is not authorized!");
 
-    const role = await Role.findOne({ where: { name: EUserRole.USER } });
+    const role = await Role.findOne({ where: { id: user.roleId } });
     if (!role)
       throw ResponseError.InternalServerError("Can't find user role id");
 
-    const actions = await permissionService.getPermissionsByRoleId(role.id);
+    const actions = await permissionService.getPermissionsByRoleId(user.roleId);
     const userDto = new UserDto(user, role.name, actions);
 
     const tokens = tokenService.generateTokens({ ...userDto });
