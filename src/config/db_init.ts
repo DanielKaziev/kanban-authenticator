@@ -1,27 +1,27 @@
 import Permission from "../models/Permission";
 import Role from "../models/Role";
 import RolePermission from "../models/RolePermission";
+import ROLES from "./roles";
 
 const checkAndCreateRolesAndPermissions = async () => {
-  const rolesPermissions = {
-    admin: ["control_users", "control_board"],
-    user: ["create_board", "update_board", "delete_board"],
-  };
+  for (const role of ROLES) {
+    const { name, permissions } = role;
 
-  for (const [roleName, permissions] of Object.entries(rolesPermissions)) {
-    let role = await Role.findOne({ where: { name: roleName } });
-    if (!role) {
-      role = await Role.create({
-        name: roleName,
-        description: `${roleName} role`,
+    let dbRole = await Role.findOne({ where: { name } });
+
+    if (!dbRole) {
+      dbRole = await Role.create({
+        name,
+        description: `${name} role`,
       });
-      console.log(`Создана роль: ${roleName}`);
+      console.log(`Создана роль: ${name}`);
     }
 
     for (const permissionAction of permissions) {
       let permission = await Permission.findOne({
         where: { action: permissionAction },
       });
+
       if (!permission) {
         permission = await Permission.create({ action: permissionAction });
         console.log(`Создано разрешение: ${permissionAction}`);
@@ -29,21 +29,20 @@ const checkAndCreateRolesAndPermissions = async () => {
 
       const rolePermissionExists = await RolePermission.findOne({
         where: {
-          roleId: role.id,
+          roleId: dbRole.id,
           permissionId: permission.id,
         },
       });
 
       if (!rolePermissionExists) {
         await RolePermission.create({
-          roleId: role.id,
+          roleId: dbRole.id,
           permissionId: permission.id,
         });
-        console.log(
-          `Роль ${roleName} связана с разрешением ${permissionAction}`
-        );
+        console.log(`Роль ${name} связана с разрешением ${permissionAction}`);
       }
     }
   }
 };
+
 export default checkAndCreateRolesAndPermissions;

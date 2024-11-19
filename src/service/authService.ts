@@ -1,4 +1,4 @@
-import { EUserState } from "../config/state";
+import { EUserRole, EUserState } from "../config/state";
 import Role from "../models/Role";
 import User from "../models/User";
 import { RequestError, ResponseError } from "../utils/errors";
@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import tokenService from "./tokenService";
 import UserDto from "../dtos/userDto";
 import { IBaseUserCredentials, ICreateUserCredentials } from "../types/users";
+import permissionService from "./permissionService";
 
 class AuthService {
   public async registration(data: ICreateUserCredentials) {
@@ -14,34 +15,33 @@ class AuthService {
     const isExist = await User.findOne({ where: { email } });
 
     if (isExist)
-      RequestError.BadRequest(`User with email: ${email} already exist!`);
+      throw RequestError.BadRequest(`User with email: ${email} already exist!`);
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const role = await Role.findOne({ where: { name: "user" } });
+    const role = await Role.findOne({ where: { name: EUserRole.USER } });
+    if (!role)  throw ResponseError.InternalServerError("Can't find user role id");
 
-    if (role) {
-      const user = await User.create({
-        email: email,
-        password: hashedPassword,
-        username: username,
-        roleId: role?.id,
-        salt: salt,
-        state: EUserState.ACTIVE,
-      });
+    const user = await User.create({
+      email: email,
+      password: hashedPassword,
+      username: username,
+      roleId: role.id,
+      salt: salt,
+      state: EUserState.ACTIVE,
+    });
 
-      const userDto = new UserDto(user);
-      const tokens = tokenService.generateTokens({ ...userDto });
+    const actions = await permissionService.getPermissionsByRoleId(role.id);
 
-      await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+    const userDto = new UserDto(user, role.name, actions);
+    const tokens = tokenService.generateTokens({ ...userDto });
 
-      return {
-        ...tokens,
-      };
-    } else {
-      throw ResponseError.InternalServerError("Can't find user role id");
-    }
+    await tokenService.saveTokens(userDto.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+    };
   }
 
   public async login(data: IBaseUserCredentials) {
@@ -52,12 +52,20 @@ class AuthService {
       throw RequestError.BadRequest(`User with email: ${email} doesn't exist!`);
 
     const isPasswordSame = await bcrypt.compare(password, user.password);
-    if (!isPasswordSame)
+    if (!isPasswordSame) {
       throw RequestError.BadRequest(
         `Incorrect password for user: ${user.email}`
       );
+    }
 
-    const userDto = new UserDto(user);
+    const role = await Role.findOne({ where: { id: user.roleId } });
+    if (!role)
+      throw ResponseError.InternalServerError("Can't find user role");
+
+    const actions = await permissionService.getPermissionsByRoleId(user.roleId);
+
+    const userDto = new UserDto(user, role.name, actions);
+
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveTokens(userDto.id, tokens.refreshToken);
 
@@ -84,7 +92,13 @@ class AuthService {
     const user = await User.findOne({ where: { id: userData.id } });
     if (!user) throw RequestError.Unauthorized("User is not authorized!");
 
-    const userDto = new UserDto(user);
+    const role = await Role.findOne({ where: { id: user.roleId } });
+    if (!role)
+      throw ResponseError.InternalServerError("Can't find user role id");
+
+    const actions = await permissionService.getPermissionsByRoleId(user.roleId);
+    const userDto = new UserDto(user, role.name, actions);
+
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveTokens(userDto.id, tokens.refreshToken);
 

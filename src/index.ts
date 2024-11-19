@@ -1,31 +1,12 @@
-import express, { Application } from "express";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import dotenv from "dotenv";
+import app from "./app";
 import sequelize from "./db";
-import "./models/models";
-import router from "./routes";
+import dotenv from "dotenv";
 import checkAndCreateRolesAndPermissions from "./config/db_init";
-import errorMiddleware from "./middlewares/errorMiddleware";
+import "./grpcServer";
 
 dotenv.config();
 
-const app: Application = express();
 const PORT = process.env.KANBAN_AUTH_PORT || 5000;
-const BASE_URL = process.env.KANBAN_BASE_API_URL || "/api";
-
-const corsOptions = {
-  origin: 'http://localhost:3000',  // Укажите точный origin, не используйте '*'
-  methods: 'GET,POST,PUT,DELETE',
-  credentials: true,                // Разрешаем отправку credentials (cookie, заголовки)
-  allowedHeaders: 'Content-Type,Authorization',
-};
-
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors(corsOptions));
-app.use(BASE_URL, router);
-app.use(errorMiddleware);
 
 const start = async () => {
   try {

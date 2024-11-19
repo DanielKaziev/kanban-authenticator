@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package auth;
+
+message AuthRequest {
+    string token = 1;
+    string permission = 2;
+}
+
+message AuthTokenRequest {
+    string token = 1;
+}
+
+message AuthResponse {
+    bool access = 1;
+    string message = 2;
+    int32 code = 3;
+}
+
+service AuthService {
+    rpc ValidateTokenPermission (AuthRequest) returns (AuthResponse);
+    rpc ValidateToken (AuthTokenRequest) returns (AuthResponse);
+}
