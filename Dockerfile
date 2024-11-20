@@ -11,6 +11,8 @@ COPY . .
 
 RUN npm run build
 
+RUN mkdir -p /usr/src/app/dist/proto
+RUN cp /usr/src/app/src/proto/*.proto /usr/src/app/dist/proto/
 
 FROM node:${NODE_VERSION}
 WORKDIR /usr/src/app
